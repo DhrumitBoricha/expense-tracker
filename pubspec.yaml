@@ -24,6 +24,8 @@ dependencies:
   firebase_storage:
   fluttertoast:
   charts_flutter:
+  provider:
+  firebase_analytics:
 
 
   cupertino_icons: ^1.0.2

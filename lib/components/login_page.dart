@@ -15,31 +15,47 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   late TextEditingController login_email;
   late TextEditingController login_pass;
+  bool isLoading = false; // Add loading state
 
-  final _fauth13 =  FirebaseAuth.instance;
-
-  login()async {
-    try{
-      await _fauth13.signInWithEmailAndPassword(email:login_email.text , password: login_pass.text).then((value) async {
-        Navigator.push(context, MaterialPageRoute(builder:(context)=>MoneyHome())
-
-        ).onError(( FirebaseAuthException error, stackTrace) {
-          Fluttertoast.showToast(msg: error.message.toString());
-        });
-      });
-    }
-    on FirebaseAuthException catch(error)
-    {
-      Fluttertoast.showToast(msg: error.message.toString());
-    }
-  }
-
+  final _fauth13 = FirebaseAuth.instance;
 
   @override
   void initState() {
     super.initState();
     login_email = TextEditingController();
     login_pass = TextEditingController();
+
+    // Check if user is already logged in after the build process
+    WidgetsBinding.instance!.addPostFrameCallback((_) {
+      checkCurrentUser();
+    });
+  }
+
+  checkCurrentUser() async {
+    User? user = _fauth13.currentUser;
+    if (user != null) {
+      Navigator.pushReplacement(context, MaterialPageRoute(builder:(context)=>MoneyHome()));
+    }
+  }
+
+  login() async {
+    setState(() {
+      isLoading = true; // Start loading
+    });
+
+    try {
+      await _fauth13.signInWithEmailAndPassword(email:login_email.text , password: login_pass.text).then((value) {
+        Navigator.pushReplacement(context, MaterialPageRoute(builder:(context)=>MoneyHome()));
+      }).onError(( FirebaseAuthException error, stackTrace) {
+        Fluttertoast.showToast(msg: error.message.toString());
+      });
+    } on FirebaseAuthException catch(error) {
+      Fluttertoast.showToast(msg: error.message.toString());
+    } finally {
+      setState(() {
+        isLoading = false; // Stop loading
+      });
+    }
   }
 
   @override
@@ -116,14 +132,13 @@ class _LoginPageState extends State<LoginPage> {
         ElevatedButton(
           onPressed: () {
             login();
-            // Implement login logic here
           },
           style: ElevatedButton.styleFrom(
             shape: const StadiumBorder(),
             padding: const EdgeInsets.symmetric(vertical: 16),
             backgroundColor: Color(0xFF0C0C3D),
           ),
-          child: const Text(
+          child: isLoading ? CircularProgressIndicator() : const Text(
             "Login",
             style: TextStyle(fontSize: 20),
           ),

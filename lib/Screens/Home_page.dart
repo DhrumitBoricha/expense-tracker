@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../components/login_page.dart';
 import 'add money page.dart';
 
 
@@ -40,6 +41,23 @@ class _MoneyHomeState extends State<MoneyHome> {
       totalExpense = snapshot['totalExpense'] ?? 0;
     });
   }
+
+  void _logout() async {
+    try {
+      await FirebaseAuth.instance.signOut();
+      // Navigate to login page after logout
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LoginPage()));
+    } catch (e) {
+      // Handle error if logout fails
+      print("Failed to log out: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to log out'),
+        ),
+      );
+    }
+  }
+
 
   void _resetTotals() {
     // Reset total income and expense to 0
@@ -126,152 +144,178 @@ class _MoneyHomeState extends State<MoneyHome> {
                           padding: const EdgeInsets.only(top: 8, left: 10, right: 8),
                           child: Row(
                             children: [
-                              Text(
-                                'Hello,',
-                                style: TextStyle(
-                                  fontSize: 30,
+                              Column(
+                                children: [
+                                  Text(
+                                    'Hello,',
+                                    style: TextStyle(
+                                      fontSize: 30,
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(bottom: 8, left: 10, right: 8),
+                                    child: Row(
+                                      children: [
+                                        Text(
+                                          uname.toString(),
+                                          style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                          Spacer(),
+                          Padding(
+                            padding: const EdgeInsets.only(right: 15),
+                            child: GestureDetector(
+                              onTap: () {
+                                _logout(); // Call the logout function
+                              },
+                              child: Container(
+                                padding: EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  border: Border.all(color: Colors.black),
                                 ),
-                              )
+                                child: Icon(Icons.logout),
+                              ),
+                            ),
+                          ),
                             ],
                           ),
                         ),
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 8, left: 10, right: 8),
-                          child: Row(
-                            children: [
-                              Text(
-                                uname.toString(),
-                                style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
-                              )
-                            ],
-                          ),
-                        ),
-                        Container(
-                          height: h * 0.3,
-                          width: w * 0.845,
-                          decoration: BoxDecoration(
-                            color: Colors.grey.shade300,
-                            borderRadius: BorderRadius.circular(30)
-                          ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              height: h * 0.3,
+                              width: w * 0.845,
+                              decoration: BoxDecoration(
+                                color: Colors.grey.shade300,
+                                borderRadius: BorderRadius.circular(30)
+                              ),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
 
-                              Padding(
-                                padding: const EdgeInsets.only(top: 30,left: 20),
-                                child: Row(
-                                  children: [
-                                    Container(
-                                      height: h*0.03,
-                                      width: w*0.03,
-                                      decoration: BoxDecoration(
-                                        color: Colors.green.shade400,
-                                        borderRadius: BorderRadius.circular(30)
-                                      ),
-                                    ),
-                                    SizedBox(width: 8,),
-                                    Text("Income"),
-                                  ],
-                                ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(left: 30),
-                                child:
-                                Row(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      'Total Income: $totalIncome',
-                                      style: TextStyle(fontSize: 20),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(top: 30,left: 20),
-                                child: Row(
-                                  children: [
-                                    Container(
-                                      height: h*0.03,
-                                      width: w*0.03,
-                                      decoration: BoxDecoration(
-                                        color: Colors.red.shade400,
-                                        borderRadius: BorderRadius.circular(30)
-                                      ),
-                                    ),SizedBox(width: 8,),
-                                    Text("Expense"),
-                                  ],
-                                ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(left: 30),
-                                child:
-                                Row(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      'Total Expense: $totalExpense',
-                                      style: TextStyle(fontSize: 20),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(top: 10,),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    ElevatedButton(
-                                      onPressed: _reloadTotalsData,
-                                      style: ElevatedButton.styleFrom(
-                                        primary: Color(0xFFB7D9AE), // Background color
-                                        onPrimary: Colors.black, // Text color
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(15), // Rounded corners
-                                          side: BorderSide(color: Color(0xFFCDD9CB), width: 2), // Border
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 30,left: 20),
+                                    child: Row(
+                                      children: [
+                                        Container(
+                                          height: h*0.03,
+                                          width: w*0.03,
+                                          decoration: BoxDecoration(
+                                            color: Colors.green.shade400,
+                                            borderRadius: BorderRadius.circular(30)
+                                          ),
                                         ),
-                                        elevation: 2, // Elevation
-                                        minimumSize: Size(120, 40), // Button size
-                                        padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16), // Button padding
-                                      ),
-                                      child: Text(
-                                        "Reload",
-                                        style: TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.bold,
-                                          letterSpacing: 1.2,
-                                        ),
-                                      ),
+                                        SizedBox(width: 8,),
+                                        Text("Income"),
+                                      ],
                                     ),
-                                    SizedBox(width: 30,),
-                                    ElevatedButton(
-                                      onPressed: _resetTotals,
-                                      style: ElevatedButton.styleFrom(
-                                        primary: Color(0xFFB7D9AE), // Background color
-                                        onPrimary: Colors.black, // Text color
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(15), // Rounded corners
-                                          side: BorderSide(color: Color(0xFFCDD9CB), width: 2), // Border
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 30),
+                                    child:
+                                    Row(
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          'Total Income: $totalIncome',
+                                          style: TextStyle(fontSize: 20),
                                         ),
-                                        elevation: 2, // Elevation
-                                        minimumSize: Size(120, 40), // Button size
-                                        padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16), // Button padding
-                                      ),
-                                      child: Text(
-                                        "Reset data",
-                                        style: TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.bold,
-                                          letterSpacing: 1.2,
-                                        ),
-                                      ),
+                                      ],
                                     ),
-                                  ],
-                                ),
-                              )
-                            ],
-                          ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 30,left: 20),
+                                    child: Row(
+                                      children: [
+                                        Container(
+                                          height: h*0.03,
+                                          width: w*0.03,
+                                          decoration: BoxDecoration(
+                                            color: Colors.red.shade400,
+                                            borderRadius: BorderRadius.circular(30)
+                                          ),
+                                        ),SizedBox(width: 8,),
+                                        Text("Expense"),
+                                      ],
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 30),
+                                    child:
+                                    Row(
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          'Total Expense: $totalExpense',
+                                          style: TextStyle(fontSize: 20),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 10,),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        ElevatedButton(
+                                          onPressed: _reloadTotalsData,
+                                          style: ElevatedButton.styleFrom(
+                                            primary: Color(0xFFB7D9AE), // Background color
+                                            onPrimary: Colors.black, // Text color
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.circular(15), // Rounded corners
+                                              side: BorderSide(color: Color(0xFFCDD9CB), width: 2), // Border
+                                            ),
+                                            elevation: 2, // Elevation
+                                            minimumSize: Size(120, 40), // Button size
+                                            padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16), // Button padding
+                                          ),
+                                          child: Text(
+                                            "Reload",
+                                            style: TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.bold,
+                                              letterSpacing: 1.2,
+                                            ),
+                                          ),
+                                        ),
+                                        SizedBox(width: 30,),
+                                        ElevatedButton(
+                                          onPressed: _resetTotals,
+                                          style: ElevatedButton.styleFrom(
+                                            primary: Color(0xFFB7D9AE), // Background color
+                                            onPrimary: Colors.black, // Text color
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.circular(15), // Rounded corners
+                                              side: BorderSide(color: Color(0xFFCDD9CB), width: 2), // Border
+                                            ),
+                                            elevation: 2, // Elevation
+                                            minimumSize: Size(120, 40), // Button size
+                                            padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16), // Button padding
+                                          ),
+                                          child: Text(
+                                            "Reset data",
+                                            style: TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.bold,
+                                              letterSpacing: 1.2,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  )
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
                         GestureDetector(
                           onTap: (){
@@ -399,25 +443,28 @@ class _MoneyHomeState extends State<MoneyHome> {
               ),
             ),
             height: 60,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                Container(
-                    decoration: BoxDecoration(
-                        color: Colors.blue.shade50,
-                        borderRadius: BorderRadius.circular(10)),
-                    child: buildNavBarItem(Icons.home, 0)),
-                Container(
-                    decoration: BoxDecoration(
-                        color: Colors.blue.shade50,
-                        borderRadius: BorderRadius.circular(10)),
-                    child: buildNavBarItem(Icons.add, 1)),
-                Container(
-                    decoration: BoxDecoration(
-                        color: Colors.blue.shade50,
-                        borderRadius: BorderRadius.circular(10)),
-                    child: buildNavBarItem(Icons.settings, 2)),
-              ],
+            child: Padding(
+              padding: const EdgeInsets.only(top: 15),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Container(
+                      decoration: BoxDecoration(
+                          color: Colors.blue.shade50,
+                          borderRadius: BorderRadius.circular(10)),
+                      child: buildNavBarItem(Icons.home, 0)),
+                  Container(
+                      decoration: BoxDecoration(
+                          color: Colors.blue.shade50,
+                          borderRadius: BorderRadius.circular(10)),
+                      child: buildNavBarItem(Icons.add, 1)),
+                  Container(
+                      decoration: BoxDecoration(
+                          color: Colors.blue.shade50,
+                          borderRadius: BorderRadius.circular(10)),
+                      child: buildNavBarItem(Icons.settings, 2)),
+                ],
+              ),
             ),
           ),
         ),
